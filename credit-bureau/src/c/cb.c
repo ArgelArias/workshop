@@ -134,8 +134,8 @@ addcredit(char *credit){
 editcredit(char *credit){
     printf("edit");
     FILE *fd;
-    fd = fopen("file.txt", "a+");
-    int i;
+    fd = fopen("file.txt", "r+");
+    int i,j;
     char line[256];
     //erase from the line the 5 first chars "edit|"
     for(i=0;i<256;i++)
@@ -145,16 +145,32 @@ editcredit(char *credit){
         if((credit[i] == '|' && credit[i+1] == 'Y' && credit[i+2] == 13) || (credit[i] == '|' && credit[i+1] == 'N' && credit[i+2] == 13))
             credit[i+2] = '\0';
     }
-    //search to the credit ti edit *still on build*
+    //search to the credit to edit *still on build*
     while(!feof(fd)){
-        fgets(line,256,fd);
-        if(strstr(line, credit)){
-            fseek(fd,-1,1);
-            fputc('N',fd);
-            //printf("%c\n",fgetc(fd));
-            fseek(fd,-1,1);
+        for(i=0;i<256;i++){
+            line[i] = fgetc(fd);
+            if(line[i] == '\n' || feof(fd))
+                break;
         }
 
+        char fline[i];
+        for(j=0;j<i;j++){
+			fline[j] = line[j];
+		}
+
+        if(strstr(fline, credit)){
+            if(line[i] == '\n'){
+                fseek(fd,-3,1);
+                fputc('N', fd);
+                fseek(fd,2,1);
+            }
+            else
+                if(line[i] == -1){
+                    fseek(fd,-1,1);
+                    fputc('N', fd);
+                    fseek(fd,0,2);
+                }
+        }
     }
     fclose(fd);
 }
